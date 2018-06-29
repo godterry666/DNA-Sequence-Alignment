@@ -5,6 +5,7 @@ import java.util.List;
 
 
 
+
 public class DynamicProgramming {
 	private int row = 0;
 	private int col = 0;
@@ -48,69 +49,57 @@ public class DynamicProgramming {
 		return mat;	
 	}
 	
-	public List<Matt> trace(int mat[][], String DNA1, String DNA2, int sit) {
-		if(sit == 0)
-		{
-			System.out.printf("（%d,%d）",row,col);
-			System.out.println();
-			list.add(new Matt(row, col));
-		}
-		else if(sit == 1)
-		{
+	
+	public  List<Matt> trace(int mat[][], String DNA1, String DNA2, int sit) {
+		System.out.println("回溯路线：");
+		if (sit == 0) {
+			System.out.println("(" + row + "," + col + ")");
+			list.add(new Matt(0, 0));
+		} else if (sit == 1) {
 			row++;
 			col++;
-			System.out.printf("（%d,%d）",row,col);
-			System.out.println();
+			System.out.println("(" + row + "," + col + ")");
 			list.add(new Matt(row, col));
-		}
-		else if(sit == 2)
-		{
+		} else if (sit == 2) {
 			row++;
-			System.out.printf("（%d,%d）",row,col);
-			System.out.println();
+			System.out.println("(" + row + "," + col + ")");
 			list.add(new Matt(row, col));
-		}
-		else if(sit == 3);
-		{
+		} else if (sit == 3) {
 			col++;
-			System.out.printf("（%d,%d）",row,col);
-			System.out.println();
+			System.out.println("(" + row + "," + col + ")");
 			list.add(new Matt(row, col));
 		}
-		
-		if (mat.length > 1 && mat[0].length > 1) 
-		{
+ 
+		if (mat.length > 1 && mat[0].length > 1) {
 			int temp = mat[0][0];
 			int penalty = 0;
-			if (DNA1.charAt(0) == DNA2.charAt(0)) 
-			{
+			if (DNA1.charAt(0) == DNA2.charAt(0)) {
 				penalty = 0;
-			}
-			else 
-			{
+			} else {
 				penalty = 1;
 			}
-			
-			if (temp == mat[0 + 1][0 + 1] + penalty) 
-			{
-				String Subrow = DNA1.substring(1);
-				String Subcol = DNA2.substring(1);
-				trace(getSub(mat, Subrow, Subcol, 1, 1), Subrow, Subcol, 1);
-			} 
-			else if (temp == mat[0][0 + 1] + 2) {
-				String Subrow = DNA1.substring(0);
-				String Subcol = DNA2.substring(1);
-				trace(getSub(mat, Subrow, Subcol, 0, 1), Subrow, Subcol, 2);
-			} 
-			else if (temp == mat[0 + 1][0] + 2) {
-				String Subrow = DNA1.substring(1);
-				String Subcol = DNA2.substring(0);
-				trace(getSub(mat, Subrow, Subcol, 1, 0), Subrow, Subcol, 3);
-			}	
+ 
+			if (temp == mat[0 + 1][0 + 1] + penalty) {
+				String SubRowString = DNA1.substring(1);
+				String SubColString = DNA2.substring(1);
+				trace(getSub(mat, SubRowString, SubColString, 1, 1), SubRowString, SubColString, 1);
+ 
+			} else if (temp == mat[0][0 + 1] + 2) {
+				String SubRowString = DNA1.substring(0);
+				String SubColString = DNA2.substring(1);
+				trace(getSub(mat, SubRowString, SubColString, 0, 1), SubRowString, SubColString, 2);
+ 
+			} else if (temp == mat[0 + 1][0] + 2) {
+				String SubRowString = DNA1.substring(1);
+				String SubColString = DNA2.substring(0);
+				trace(getSub(mat, SubRowString, SubColString, 1, 0), SubRowString, SubColString, 3);
+ 
+			}
 		}
+		
 		return list;
+ 
 	}
-	
 	public int[][] getSub(int mat[][], String subDNA1, String subDNA2, int rstart, int cstart){
 		int sublength = subDNA1.length();
 		int subwidth = subDNA2.length();
@@ -128,8 +117,8 @@ public class DynamicProgramming {
 		char[][] sMatt = new char[2][length+1];
 		
 		sMatt[0][0] = DNA1.charAt(list.get(0).getRow());
-		sMatt[1][0] = DNA1.charAt(list.get(0).getRow());
-		for (int i = 1; i < list.size()-1; i++) {
+		sMatt[1][0] = DNA2.charAt(list.get(0).getRow());
+		for (int i = list.size()-2; i > 0; i--) {
 			int iNew = list.get(i).getRow();
 			int jNew = list.get(i).getCol();
 			
@@ -140,7 +129,7 @@ public class DynamicProgramming {
 			} 
 			else if ((iNew == list.get(i - 1).getRow()) && (jNew != list.get(i - 1).getCol())) {
 				sMatt[0][i] = DNA1.charAt(jNew);
-				sMatt[1][i] = '#';
+				sMatt[1][i] = '-';
 			}
 			else if ((iNew != list.get(i - 1).getRow()) && (jNew == list.get(i - 1).getCol())) 
 			{
@@ -174,13 +163,18 @@ public class DynamicProgramming {
 		}
 	}
 	public static void main(String[] args) {
-		String String1 = "AACAGTTACC";
-		String String2 = "TAAGGTCA";
+		/*String DNA1 = "AACAGTTACC";
+		String DNA2 = "TAAGGTCA";*/
+		String DNA1 = "AACAGTTACCATCGAAACAGAACAGTTACCAA";
+		String DNA2 = "TAAGGTCACGACTAAGTAAGGTCATAAGG";
 		DynamicProgramming seq = new DynamicProgramming();
-		int[][] costArray = seq.getMatrix(String1, String2);
-		 List<Matt> list = seq.trace(costArray, String1, String2, 0);
-		char[][] sMatt = seq.getSequence(String1, String2, list);
-		System.out.println("对齐序列为:\n" + sMatt);
+		long startTime=System.currentTimeMillis();
+		int[][] Array = seq.getMatrix(DNA1, DNA2);
+		 List<Matt> list = seq.trace(Array, DNA1, DNA2, 0);
+		 System.out.println("对齐方式为：");
+		char[][] sMatt = seq.getSequence(DNA1, DNA2, list);
+		long endTime=System.currentTimeMillis(); //获取结束时间	 
+		System.out.println("程序运行时间： "+(endTime-startTime)+"ms");
 	}
 }
 
